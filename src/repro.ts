@@ -9,8 +9,11 @@ const telemetryConsoleLogger = (envelope: Contracts.Envelope, _contextObjects?: 
 }): boolean => {
   switch (envelope.data.baseType) {
     case "RemoteDependencyData": {
-      console.log("## DEPENDENCY ######################################################");
       const data = envelope.data as Data<RemoteDependencyData>;
+      if (data.baseData.type.toLowerCase() !== "http") {
+        break;
+      };
+      console.log("## DEPENDENCY ######################################################");
       console.log(data.baseData.data);
       console.log("########################################################");
       break;

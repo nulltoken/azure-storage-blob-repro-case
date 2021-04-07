@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@azure/storage-blob": "^12.4.1",
+    "@opentelemetry/api": "^0.16.0",
     "@opentelemetry/tracing": "^0.16.0",
     "applicationinsights": "^1.8.10"
   }

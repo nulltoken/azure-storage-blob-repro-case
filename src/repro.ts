@@ -1,8 +1,9 @@
 import { setup, defaultClient } from 'applicationinsights';
 import { Contracts } from "applicationinsights";
 import { Data, ExceptionData, RemoteDependencyData } from "applicationinsights/out/Declarations/Contracts";
-import fetch from 'node-fetch';
 import { BlobClient } from "@azure/storage-blob";
+
+let totalNumberOfDependencyCalls = 0;
 
 const telemetryConsoleLogger = (envelope: Contracts.Envelope, _contextObjects?: {
   [name: string]: unknown;
@@ -13,9 +14,7 @@ const telemetryConsoleLogger = (envelope: Contracts.Envelope, _contextObjects?: 
       if (data.baseData.type.toLowerCase() !== "http") {
         break;
       };
-      console.log("## DEPENDENCY ######################################################");
-      console.log(data.baseData.data);
-      console.log("########################################################");
+      totalNumberOfDependencyCalls++;
       break;
     }
 
@@ -34,27 +33,38 @@ const telemetryConsoleLogger = (envelope: Contracts.Envelope, _contextObjects?: 
   return true;
 };
 
+const download = async (cn: string, containerName: string, blobPath: string): Promise<void> => {
+  console.log("Downloading...");
+  const bc = new BlobClient(cn, containerName, blobPath);
+  const buf = await bc.downloadToBuffer();
+  console.log("Size of downloaded blob", buf.byteLength);
+  console.log("totalNumberOfDependencyCalls", totalNumberOfDependencyCalls)
+  console.log("---------------------------------")
+}
+
 void (async function () {
   setup("_your_ikey_").start();
 
   defaultClient.addTelemetryProcessor(telemetryConsoleLogger);
-
-  const depUrl1 = 'https://github.com/';
-  const response1 = await fetch(depUrl1);
-  const body1 = await response1.text();
-  console.log(depUrl1, body1.length);
 
   const cn = "BlobEndpoint=https://...."; // Connection string
 
   const containerName = "yourContainerName";
   const blobPath = "yourBlobPath";
 
-  const bc = new BlobClient(cn, containerName, blobPath);
-  const buf = await bc.downloadToBuffer();
-  console.log("Size of downloaded blob", buf.byteLength);
+  console.log("Initial totalNumberOfDependencyCalls", totalNumberOfDependencyCalls)
 
-  const depUrl2 = 'https://github.com/Azure/azure-sdk-for-js';
-  const response2 = await fetch(depUrl2);
-  const body2 = await response2.text();
-  console.log(depUrl2, body2.length);
+  await download(cn, containerName, blobPath);
+
+  await download(cn, containerName, blobPath);
+
+  await download(cn, containerName, blobPath);
+
+  await download(cn, containerName, blobPath);
+
+  await download(cn, containerName, blobPath);
+
+  await download(cn, containerName, blobPath);
+
+  await download(cn, containerName, blobPath);
 })();
